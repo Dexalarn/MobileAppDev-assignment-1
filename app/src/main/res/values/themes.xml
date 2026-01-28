@@ -1,0 +1,11 @@
+<resources>
+
+    <!-- Here we define a dialog window theme -->
+    <style name="AppTheme" parent="Theme.AppCompat.Dialog">
+    </style>
+    <!--Here we define a theme with no action bar and no window title-->
+    <style name="AppTheme.NoTitle">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+</resources>
