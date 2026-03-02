@@ -1,10 +1,3 @@
 <resources>
-    <string name="app_name">Assignment 2-1</string>
-    <string name="first_name">First Name</string>
-    <string name="last_name">Last Name</string>
-    <string name="birthday">Birthday</string>
-    <string name="phone">Phone Number</string>
-    <string name="home_address">Home Address</string>
-    <string name="email">Email Address</string>
-    <string name="logo_desc">Application Logo</string>
+    <string name="app_name">RandomGenerator</string>
 </resources>
