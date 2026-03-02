@@ -1,82 +1,108 @@
 package com.example.example1;
-import androidx.appcompat.app.AppCompatActivity;
+
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Button;
-import android.widget.EditText;
+import android.text.TextWatcher;
+import android.text.Editable;
+import android.widget.*;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.example1.model.BlogEntry;
+import com.example.example1.model.BlogEntryHandler;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    String tag="EVH_Demo: ";
-    long lastTime = 0; // time stamp of previous event
-    //form variables
-    EditText Form_name, Form_email , Form_phone, Form_feedback;
-    Button btnSubmit, btnReset;
 
-    private void longWithTime(String methodName){
-        long currentTime = System.currentTimeMillis();
-        if (lastTime != 0) {
-            long elapsed = currentTime - lastTime;
-            Log.d(tag, methodName + " - elapsed time: " + elapsed + " ms");
-        } else {
-            Log.d(tag, methodName);
-        }
-        lastTime = currentTime;
+    private EditText editName, editComment, editSearchText, editSearchDate;
+    private TextView textEntries;
+    private BlogEntryHandler handler = new BlogEntryHandler();
 
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        longWithTime("onCreate()");
 
-        Form_name = findViewById(R.id.editTextName);
-        Form_email = findViewById(R.id.editTextEmail);
-        Form_phone = findViewById(R.id.editTextPhone);
-        Form_feedback = findViewById(R.id.editFeedback);
+        editName = findViewById(R.id.editName);
+        editComment = findViewById(R.id.editComment);
+        editSearchText = findViewById(R.id.editSearchText);
+        editSearchDate = findViewById(R.id.editSearchDate);
+        textEntries = findViewById(R.id.textEntries);
 
-        btnSubmit = findViewById(R.id.buttonSubmit);
-        btnReset = findViewById(R.id.buttonReset);
+        Button buttonSubmit = findViewById(R.id.buttonSubmit);
+        Button buttonSearch = findViewById(R.id.buttonSearch);
 
-        btnSubmit.setOnClickListener(v -> {
+        buttonSubmit.setOnClickListener(v -> submitEntry());
+        buttonSearch.setOnClickListener(v -> searchEntries());
 
+        addFieldResetListener(editName);
+        addFieldResetListener(editComment);
+    }
+
+    private void submitEntry() {
+        String name = editName.getText().toString().trim();
+        String comment = editComment.getText().toString().trim();
+
+        boolean valid = true;
+
+        if (name.isEmpty()) {
+            editName.setBackgroundColor(Color.RED);
+            valid = false;
+        }
+
+        if (comment.isEmpty()) {
+            editComment.setBackgroundColor(Color.RED);
+            valid = false;
+        }
+
+        if (!valid) return;
+
+        BlogEntry entry = new BlogEntry(name, comment);
+        handler.addEntry(entry);
+
+        displayEntries(handler.getAllEntries());
+
+        editName.setText("");
+        editComment.setText("");
+    }
+
+    private void searchEntries() {
+        String text = editSearchText.getText().toString().trim();
+        String date = editSearchDate.getText().toString().trim();
+
+        List<BlogEntry> result;
+
+        if (!text.isEmpty()) {
+            result = handler.searchByText(text);
+        } else if (!date.isEmpty()) {
+            result = handler.searchByDate(date);
+        } else {
+            result = handler.getAllEntries();
+        }
+
+        displayEntries(result);
+    }
+
+    private void displayEntries(List<BlogEntry> entries) {
+        StringBuilder sb = new StringBuilder();
+
+        int count = entries.size();
+        for (BlogEntry entry : entries) {
+            sb.append("Entry #").append(count--).append("\n");
+            sb.append(entry.toString()).append("\n\n");
+        }
+
+        textEntries.setText(sb.toString());
+    }
+
+    private void addFieldResetListener(EditText field) {
+        field.addTextChangedListener(new TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                field.setBackgroundColor(Color.TRANSPARENT);
+            }
+            public void afterTextChanged(Editable s) {}
         });
-        btnReset.setOnClickListener(v -> {
-            Form_name.setText("");
-            Form_email.setText("");
-            Form_phone.setText("");
-            Form_feedback.setText("");
-        });
-        btnSubmit.setOnClickListener(v -> {
-            Log.d("FORM", "Name: " + Form_name.getText());
-            Log.d("FORM", "E-mail: " + Form_email.getText());
-            Log.d("FORM", "Phone: " + Form_phone.getText());
-            Log.d("FORM", "Feedback: " + Form_feedback.getText());
-        });
-
-
-    }
-    protected void onStart() {
-        super.onStart();
-        longWithTime("onStart()");
-    }
-    protected void onRestart() {
-        super.onRestart();
-        longWithTime("onRestart()");
-    }
-    protected void onResume() {
-        super.onResume();
-        longWithTime("onResume()");
-    }
-    protected void onPause() {
-        super.onPause();
-        longWithTime("onStop()");
-    }
-    protected void onStop() {
-        super.onStop();
-        longWithTime("onStop()");
-    }
-    protected void onDestroy() {
-        super.onDestroy();
-        longWithTime("onDestroy()");
     }
 }
