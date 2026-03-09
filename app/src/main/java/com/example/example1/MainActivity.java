@@ -1,86 +1,133 @@
 package com.example.example1;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Random;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView textRandom;
-    private TextView textPrevious;
+    private EditText display;
 
-    private Handler handler = new Handler();
-    private Runnable runnable;
-
-    private Random random = new Random();
-    private int currentNumber = 0;
-
-    private static final String KEY_TIME = "saved_time";
-    private static final String KEY_PREVIOUS = "saved_previous";
+    private double value1 = 0;
+    private String operation = "";
+    private boolean newNumber = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        textRandom = findViewById(R.id.textRandom);
-        textPrevious = findViewById(R.id.textPrevious);
+        display = findViewById(R.id.display);
 
-        // Restore saved data after rotation
         if (savedInstanceState != null) {
-            String savedTime = savedInstanceState.getString(KEY_TIME);
-            int previousNumber = savedInstanceState.getInt(KEY_PREVIOUS);
-
-            textPrevious.setText(String.valueOf(previousNumber));
-
-            Toast.makeText(this,
-                    "Orientation changed at: " + savedTime,
-                    Toast.LENGTH_LONG).show();
+            display.setText(savedInstanceState.getString("display"));
+            value1 = savedInstanceState.getDouble("value1");
+            operation = savedInstanceState.getString("operation");
+            newNumber = savedInstanceState.getBoolean("newNumber");
         }
-
-        startRandomGenerator();
-    }
-
-    private void startRandomGenerator() {
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                currentNumber = random.nextInt(1000); // 0–999
-                textRandom.setText(String.valueOf(currentNumber));
-
-                handler.postDelayed(this, 1000);
-            }
-        };
-
-        handler.post(runnable);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putString("display", display.getText().toString());
+        outState.putDouble("value1", value1);
+        outState.putString("operation", operation);
+        outState.putBoolean("newNumber", newNumber);
+
         super.onSaveInstanceState(outState);
-
-        // Save current date & time
-        String currentTime = new SimpleDateFormat(
-                "yyyy-MM-dd HH:mm:ss",
-                Locale.getDefault()).format(new Date());
-
-        outState.putString(KEY_TIME, currentTime);
-
-        // Save last random number before rotation
-        outState.putInt(KEY_PREVIOUS, currentNumber);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        handler.removeCallbacks(runnable);
+    public void numberClick(View view) {
+
+        Button button = (Button) view;
+        String number = button.getText().toString();
+
+        if (newNumber) {
+            display.setText(number);
+            newNumber = false;
+        } else {
+            display.append(number);
+        }
+    }
+
+    public void decimalClick(View view) {
+
+        String value = display.getText().toString();
+
+        if (newNumber) {
+            display.setText("0.");
+            newNumber = false;
+        } else if (!value.contains(".")) {
+            display.append(".");
+        }
+    }
+
+    public void operationClick(View view) {
+
+        Button button = (Button) view;
+
+        value1 = Double.parseDouble(display.getText().toString());
+        operation = button.getText().toString();
+        newNumber = true;
+    }
+
+    public void equalsClick(View view) {
+
+        double value2 = Double.parseDouble(display.getText().toString());
+        double result = 0;
+
+        switch (operation) {
+            case "+":
+                result = value1 + value2;
+                break;
+
+            case "-":
+                result = value1 - value2;
+                break;
+
+            case "×":
+                result = value1 * value2;
+                break;
+
+            case "÷":
+                result = value1 / value2;
+                break;
+        }
+
+        display.setText(String.valueOf(result));
+        newNumber = true;
+    }
+
+    public void percentClick(View view) {
+
+        double value = Double.parseDouble(display.getText().toString());
+        value = value / 100;
+        display.setText(String.valueOf(value));
+        newNumber = true;
+    }
+
+    public void deleteClick(View view) {
+
+        String value = display.getText().toString();
+
+        if (value.length() > 1) {
+            value = value.substring(0, value.length() - 1);
+        } else {
+            value = "0";
+            newNumber = true;
+        }
+
+        display.setText(value);
+    }
+
+    public void clearClick(View view) {
+
+        display.setText("0");
+        value1 = 0;
+        operation = "";
+        newNumber = true;
     }
 }
