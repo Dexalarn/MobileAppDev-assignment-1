@@ -1,108 +1,75 @@
 package com.example.example1;
 
-import android.graphics.Color;
 import android.os.Bundle;
-import android.text.TextWatcher;
-import android.text.Editable;
-import android.widget.*;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.example1.model.BlogEntry;
-import com.example.example1.model.BlogEntryHandler;
-
-import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-
-    private EditText editName, editComment, editSearchText, editSearchDate;
-    private TextView textEntries;
-    private BlogEntryHandler handler = new BlogEntryHandler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        editName = findViewById(R.id.editName);
-        editComment = findViewById(R.id.editComment);
-        editSearchText = findViewById(R.id.editSearchText);
-        editSearchDate = findViewById(R.id.editSearchDate);
-        textEntries = findViewById(R.id.textEntries);
+        // Create layout programmatically
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(40,40,40,40);
 
-        Button buttonSubmit = findViewById(R.id.buttonSubmit);
-        Button buttonSearch = findViewById(R.id.buttonSearch);
+        // Create TextView
+        TextView label = new TextView(this);
+        label.setText("Type your favourite number");
+        label.setTextSize(20);
 
-        buttonSubmit.setOnClickListener(v -> submitEntry());
-        buttonSearch.setOnClickListener(v -> searchEntries());
+        // Create EditText
+        EditText input = new EditText(this);
+        input.setHint("Enter number");
+        input.setInputType(EditorInfo.TYPE_CLASS_NUMBER);
+        input.setImeOptions(EditorInfo.IME_ACTION_GO);
 
-        addFieldResetListener(editName);
-        addFieldResetListener(editComment);
-    }
+        // Detect Enter / Go key
+        input.setOnEditorActionListener((v, actionId, event) -> {
 
-    private void submitEntry() {
-        String name = editName.getText().toString().trim();
-        String comment = editComment.getText().toString().trim();
+            if (actionId == EditorInfo.IME_ACTION_GO ||
+                    actionId == EditorInfo.IME_ACTION_DONE ||
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
 
-        boolean valid = true;
+                String userText = input.getText().toString();
 
-        if (name.isEmpty()) {
-            editName.setBackgroundColor(Color.RED);
-            valid = false;
-        }
+                if (!userText.isEmpty()) {
 
-        if (comment.isEmpty()) {
-            editComment.setBackgroundColor(Color.RED);
-            valid = false;
-        }
+                    int userNumber = Integer.parseInt(userText);
 
-        if (!valid) return;
+                    Random random = new Random();
+                    int randomNumber = random.nextInt(10); // 0–9
 
-        BlogEntry entry = new BlogEntry(name, comment);
-        handler.addEntry(entry);
-
-        displayEntries(handler.getAllEntries());
-
-        editName.setText("");
-        editComment.setText("");
-    }
-
-    private void searchEntries() {
-        String text = editSearchText.getText().toString().trim();
-        String date = editSearchDate.getText().toString().trim();
-
-        List<BlogEntry> result;
-
-        if (!text.isEmpty()) {
-            result = handler.searchByText(text);
-        } else if (!date.isEmpty()) {
-            result = handler.searchByDate(date);
-        } else {
-            result = handler.getAllEntries();
-        }
-
-        displayEntries(result);
-    }
-
-    private void displayEntries(List<BlogEntry> entries) {
-        StringBuilder sb = new StringBuilder();
-
-        int count = entries.size();
-        for (BlogEntry entry : entries) {
-            sb.append("Entry #").append(count--).append("\n");
-            sb.append(entry.toString()).append("\n\n");
-        }
-
-        textEntries.setText(sb.toString());
-    }
-
-    private void addFieldResetListener(EditText field) {
-        field.addTextChangedListener(new TextWatcher() {
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                field.setBackgroundColor(Color.TRANSPARENT);
+                    if (userNumber == randomNumber) {
+                        Toast.makeText(this,
+                                "Match! Random number was " + randomNumber,
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(this,
+                                "Not the same. Random number was " + randomNumber,
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+                return true;
             }
-            public void afterTextChanged(Editable s) {}
+            return false;
         });
+
+        // Add views to layout
+        layout.addView(label);
+        layout.addView(input);
+
+        // Set layout as content
+        setContentView(layout);
     }
 }
