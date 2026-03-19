@@ -1,14 +1,22 @@
 <resources>
-    <string name="app_name">Example_21</string>
-    <string name="text">Greetings!</string>
-    <string name="submit">Submit</string>
-    <string name="reset">Reset</string>
-    <string name="enter_phone_number">Enter your phone number</string>
-    <string name="phone">"Phone"</string>
-    <string name="enter_email">Enter your email</string>
-    <string name="email">Email</string>
-    <string name="enter_name">Enter your name</string>
-    <string name="name">Name</string>
-    <string name="write_feedback">Write your feedback</string>
-    <string name="feedback">"Feedback"</string>
+
+    <!-- App name -->
+    <string name="app_name">Product App</string>
+
+    <!-- Input hints -->
+    <string name="hint_id">Product ID</string>
+    <string name="hint_name">Product Name</string>
+    <string name="hint_price">Unit Price</string>
+    <string name="hint_amount">Amount</string>
+
+    <!-- Buttons -->
+    <string name="btn_submit">Submit</string>
+    <string name="btn_clear">Clear</string>
+
+    <!-- Messages -->
+    <string name="error_empty_fields">Please fill all fields</string>
+
+    <!-- Labels -->
+    <string name="summary_title">Product Summary</string>
+
 </resources>
