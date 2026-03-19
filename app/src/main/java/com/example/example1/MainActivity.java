@@ -1,4 +1,4 @@
-package com.example.example1;
+package com.example.example1z;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
