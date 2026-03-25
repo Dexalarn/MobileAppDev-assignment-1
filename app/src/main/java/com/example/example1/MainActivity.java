@@ -1,75 +1,109 @@
 package com.example.example1;
 
+import com.example.example1.model.Person;
 import android.os.Bundle;
-import android.view.KeyEvent;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Random;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
+    private ArrayList<Person> persons = new ArrayList<>();
+
+    private ArrayList<String> firstList = new ArrayList<>();
+    private ArrayList<String> lastList = new ArrayList<>();
+    private ArrayList<String> phoneList = new ArrayList<>();
+
+    private ArrayAdapter<String> firstAdapter, lastAdapter, phoneAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        // Create layout programmatically
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(40,40,40,40);
+        EditText editFirst = findViewById(R.id.editFirst);
+        EditText editLast = findViewById(R.id.editLast);
+        EditText editPhone = findViewById(R.id.editPhone);
 
-        // Create TextView
-        TextView label = new TextView(this);
-        label.setText("Type your favourite number");
-        label.setTextSize(20);
+        AutoCompleteTextView searchFirst = findViewById(R.id.searchFirst);
+        AutoCompleteTextView searchLast = findViewById(R.id.searchLast);
+        AutoCompleteTextView searchPhone = findViewById(R.id.searchPhone);
 
-        // Create EditText
-        EditText input = new EditText(this);
-        input.setHint("Enter number");
-        input.setInputType(EditorInfo.TYPE_CLASS_NUMBER);
-        input.setImeOptions(EditorInfo.IME_ACTION_GO);
+        TextView textResult = findViewById(R.id.textResult);
 
-        // Detect Enter / Go key
-        input.setOnEditorActionListener((v, actionId, event) -> {
+        Button buttonAdd = findViewById(R.id.buttonAdd);
 
-            if (actionId == EditorInfo.IME_ACTION_GO ||
-                    actionId == EditorInfo.IME_ACTION_DONE ||
-                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+        // Adapters
+        firstAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, firstList);
+        lastAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, lastList);
+        phoneAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, phoneList);
 
-                String userText = input.getText().toString();
+        searchFirst.setAdapter(firstAdapter);
+        searchLast.setAdapter(lastAdapter);
+        searchPhone.setAdapter(phoneAdapter);
 
-                if (!userText.isEmpty()) {
+        // ADD PERSON
+        buttonAdd.setOnClickListener(v -> {
 
-                    int userNumber = Integer.parseInt(userText);
+            String f = editFirst.getText().toString();
+            String l = editLast.getText().toString();
+            String p = editPhone.getText().toString();
 
-                    Random random = new Random();
-                    int randomNumber = random.nextInt(10); // 0–9
-
-                    if (userNumber == randomNumber) {
-                        Toast.makeText(this,
-                                "Match! Random number was " + randomNumber,
-                                Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(this,
-                                "Not the same. Random number was " + randomNumber,
-                                Toast.LENGTH_LONG).show();
-                    }
-                }
-                return true;
+            if (f.isEmpty() || l.isEmpty() || p.isEmpty()) {
+                Toast.makeText(this, "Fill all fields", Toast.LENGTH_SHORT).show();
+                return;
             }
-            return false;
+
+            Person person = new Person(f, l, p);
+            persons.add(person);
+
+            // IMPORTANT: no spaces
+            firstList.add(f + "_" + l + "_" + p);
+            lastList.add(l + "_" + f + "_" + p);
+            phoneList.add(p + "_" + f + "_" + l);
+
+            firstAdapter.notifyDataSetChanged();
+            lastAdapter.notifyDataSetChanged();
+            phoneAdapter.notifyDataSetChanged();
         });
 
-        // Add views to layout
-        layout.addView(label);
-        layout.addView(input);
+        // CLICK HANDLER
+        AdapterView.OnItemClickListener listener = (parent, view, position, id) -> {
 
-        // Set layout as content
-        setContentView(layout);
+            String item = (String) parent.getItemAtPosition(position);
+            String[] parts = item.split("_");
+
+            if (parts.length < 3) return; // safety
+
+            String first = "";
+            String last = "";
+            String phone = "";
+
+            if (parent.getId() == R.id.searchFirst) {
+                first = parts[0];
+                last = parts[1];
+                phone = parts[2];
+
+            } else if (parent.getId() == R.id.searchLast) {
+                first = parts[1];
+                last = parts[0];
+                phone = parts[2];
+
+            } else if (parent.getId() == R.id.searchPhone) {
+                first = parts[1];
+                last = parts[2];
+                phone = parts[0];
+            }
+
+            textResult.setText(
+                    "First name=" + first + ", Last name=" + last + ", Phone=" + phone
+            );
+        };
+
+        searchFirst.setOnItemClickListener(listener);
+        searchLast.setOnItemClickListener(listener);
+        searchPhone.setOnItemClickListener(listener);
     }
 }
