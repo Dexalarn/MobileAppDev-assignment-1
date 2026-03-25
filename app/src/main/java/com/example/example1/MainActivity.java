@@ -1,6 +1,7 @@
 package com.example.example1;
 
 import android.os.Bundle;
+import android.text.InputType;
 import android.widget.*;
 
 import androidx.annotation.NonNull;
@@ -20,18 +21,54 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        editId = findViewById(R.id.editId);
-        editName = findViewById(R.id.editName);
-        editPrice = findViewById(R.id.editPrice);
-        editAmount = findViewById(R.id.editAmount);
-        textSummary = findViewById(R.id.textSummary);
+        // ROOT ScrollView
+        ScrollView scrollView = new ScrollView(this);
 
-        Button btnSubmit = findViewById(R.id.buttonSubmit);
-        Button btnClear = findViewById(R.id.buttonClear);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(30, 30, 30, 30);
 
-        // Restore data after rotation
+        scrollView.addView(layout);
+
+        // CREATE INPUT FIELDS
+        editId = new EditText(this);
+        editId.setHint("Product ID");
+
+        editName = new EditText(this);
+        editName.setHint("Product Name");
+
+        editPrice = new EditText(this);
+        editPrice.setHint("Unit Price");
+        editPrice.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
+        editAmount = new EditText(this);
+        editAmount.setHint("Amount");
+        editAmount.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+        // BUTTONS
+        Button btnSubmit = new Button(this);
+        btnSubmit.setText("Submit");
+
+        Button btnClear = new Button(this);
+        btnClear.setText("Clear");
+
+        // SUMMARY
+        textSummary = new TextView(this);
+        textSummary.setTextSize(18);
+
+        // ADD TO LAYOUT
+        layout.addView(editId);
+        layout.addView(editName);
+        layout.addView(editPrice);
+        layout.addView(editAmount);
+        layout.addView(btnSubmit);
+        layout.addView(btnClear);
+        layout.addView(textSummary);
+
+        setContentView(scrollView);
+
+        // 🔁 RESTORE DATA AFTER ROTATION
         if (savedInstanceState != null) {
             ArrayList<String> saved = savedInstanceState.getStringArrayList(KEY_DATA);
 
@@ -49,27 +86,28 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // SUBMIT BUTTON
         btnSubmit.setOnClickListener(v -> {
 
             String id = editId.getText().toString();
             String name = editName.getText().toString();
+            String priceStr = editPrice.getText().toString();
+            String amountStr = editAmount.getText().toString();
 
-            if (id.isEmpty() || name.isEmpty()
-                    || editPrice.getText().toString().isEmpty()
-                    || editAmount.getText().toString().isEmpty()) {
-
+            if (id.isEmpty() || name.isEmpty() || priceStr.isEmpty() || amountStr.isEmpty()) {
                 Toast.makeText(this, "Fill all fields!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            double price = Double.parseDouble(editPrice.getText().toString());
-            int amount = Integer.parseInt(editAmount.getText().toString());
+            double price = Double.parseDouble(priceStr);
+            int amount = Integer.parseInt(amountStr);
 
             products.add(new Product(id, name, price, amount));
 
             updateSummary();
         });
 
+        // CLEAR BUTTON
         btnClear.setOnClickListener(v -> {
             editId.setText("");
             editName.setText("");
@@ -78,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // UPDATE UI
     private void updateSummary() {
         StringBuilder sb = new StringBuilder();
 

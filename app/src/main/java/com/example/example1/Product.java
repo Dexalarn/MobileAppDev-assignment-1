@@ -13,10 +13,12 @@ public class Product {
         this.price = price;
         this.amount = amount;
     }
+
     public String getId() { return id; }
     public String getName() { return name; }
     public double getPrice() { return price; }
     public int getAmount() { return amount; }
+
     public double getTotal() {
         return price * amount;
     }
