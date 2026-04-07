@@ -99,35 +99,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         // 🔹 ADAPTERS
+        updateAuticompleteTextViews();
 
-        // Adapter connects list → dropdown suggestions
-        firstAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_dropdown_item_1line,
-                firstList
-        );
-
-        lastAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_dropdown_item_1line,
-                lastList
-        );
-
-        phoneAdapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_dropdown_item_1line,
-                phoneList
-        );
-
-        // Attach adapters to search fields
-        searchFirst.setAdapter(firstAdapter);
-        searchLast.setAdapter(lastAdapter);
-        searchPhone.setAdapter(phoneAdapter);
-
-        // Start showing suggestions after 1 character
-        searchFirst.setThreshold(1);
-        searchLast.setThreshold(1);
-        searchPhone.setThreshold(1);
 
 
         // 🔹 ADD PERSON LOGIC
@@ -165,9 +138,8 @@ public class MainActivity extends AppCompatActivity {
             phoneList.add(p + "_" + f + "_" + l);
 
             // Notify adapters → update dropdown
-            firstAdapter.notifyDataSetChanged();
-            lastAdapter.notifyDataSetChanged();
-            phoneAdapter.notifyDataSetChanged();
+            updateAuticompleteTextViews();
+
 
             // Clear input fields
             editFirst.setText("");
@@ -225,5 +197,41 @@ public class MainActivity extends AppCompatActivity {
                             ", Phone=" + parts[0]
             );
         });
+    }
+
+    private void updateAuticompleteTextViews() {
+
+
+        // Adapter connects list → dropdown suggestions
+        firstAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                firstList
+        );
+
+        lastAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                lastList
+        );
+
+        phoneAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                phoneList
+        );
+
+        // Attach adapters to search fields
+        searchFirst.setAdapter(firstAdapter);
+        searchLast.setAdapter(lastAdapter);
+        searchPhone.setAdapter(phoneAdapter);
+
+        // Start showing suggestions after 1 character
+        searchFirst.setThreshold(1);
+        searchLast.setThreshold(1);
+        searchPhone.setThreshold(1);
+
+
+
     }
 }
